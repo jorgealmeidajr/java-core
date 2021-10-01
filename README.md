@@ -1,6 +1,6 @@
-<h1 align="center">Java core studies</h1>
+<h1 align="center">Java Core Studies</h1>
 
-<p align="center">Java 17 Maven project with only java core examples</p>
+<p align="center">A java maven project with java core examples</p>
 
 ### Java core examples
 
