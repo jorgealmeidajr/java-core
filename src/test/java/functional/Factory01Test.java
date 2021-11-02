@@ -18,6 +18,9 @@ public class Factory01Test {
 
             p = Factory01.ProductFactory.createProduct("stock");
             assertTrue(p instanceof Factory01.Stock);
+
+            p = Factory01.ProductFactory.createProduct("bond");
+            assertTrue(p instanceof Factory01.Bond);
         }
 
         @Test
@@ -36,6 +39,12 @@ public class Factory01Test {
         public void testPatternFunctional() {
             Factory01.Product p = Factory01.createProduct("loan");
             assertTrue(p instanceof Factory01.Loan);
+
+            p = Factory01.createProduct("stock");
+            assertTrue(p instanceof Factory01.Stock);
+
+            p = Factory01.createProduct("bond");
+            assertTrue(p instanceof Factory01.Bond);
         }
 
         @Test
