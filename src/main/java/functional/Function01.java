@@ -1,13 +1,12 @@
 package functional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Function01 {
 
     @FunctionalInterface
-    private static interface Function<T, R> {
+    interface Function<T, R> {
         R apply(T t);
     }
 
@@ -17,11 +16,6 @@ public class Function01 {
             result.add(f.apply(t));
         }
         return result;
-    }
-
-    public static void main(String[] args) {
-        var result1 = map(Arrays.asList(1, 2, 3, 4), (Integer i) -> i * 2);
-        var result2 = map(Arrays.asList("one", "two", "three"), (String s) -> s.toUpperCase());
     }
 
 }

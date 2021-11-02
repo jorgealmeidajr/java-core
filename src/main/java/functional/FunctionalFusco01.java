@@ -1,41 +1,12 @@
 package functional;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 // cat story oop vs functional
 public class FunctionalFusco01 {
 
-    public static void main(String[] args) {
-        {
-            // OOP implementation
-            Cat1 cat = new Cat1();
-            Bird1 bird = new Bird1();
-            cat.capture(bird);
-            cat.eat();
-        }
-
-        {
-            // functional impl 1
-            BiFunction<Cat2, Bird2, FullCat> story =
-                    ((BiFunction<Cat2, Bird2, CatWithCatch>) Cat2::capture)
-                            .andThen(CatWithCatch::eat);
-            FullCat fullCat = story.apply(new Cat2(), new Bird2());
-        }
-
-        {
-            // functional impl 2
-            BiFunction<Cat2, Bird2, CatWithCatch> capture = Cat2::capture;
-            Function<CatWithCatch, FullCat> eat = CatWithCatch::eat;
-            BiFunction<Cat2, Bird2, FullCat> story = capture.andThen(eat);
-            FullCat fullCat = story.apply(new Cat2(), new Bird2());
-        }
+    static class Bird1 {
     }
 
-    private static class Bird1 {
-    }
-
-    private static class Cat1 {
+    static class Cat1 {
         private Bird1 birdCatch;
         private boolean full;
 
@@ -47,18 +18,26 @@ public class FunctionalFusco01 {
             full = true;
             birdCatch = null;
         }
+
+        public Bird1 getBirdCatch() {
+            return birdCatch;
+        }
+
+        public boolean isFull() {
+            return full;
+        }
     }
 
-    private static class Bird2 {
+    static class Bird2 {
     }
 
-    private static class Cat2 {
+    static class Cat2 {
         public CatWithCatch capture(Bird2 bird) {
             return new CatWithCatch(bird);
         }
     }
 
-    private static class CatWithCatch {
+    static class CatWithCatch {
         private final Bird2 birdCatch;
 
         public CatWithCatch(Bird2 birdCatch) {
@@ -70,7 +49,7 @@ public class FunctionalFusco01 {
         }
     }
 
-    private static class FullCat {
+    static class FullCat {
     }
 
 }
