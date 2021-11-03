@@ -3,6 +3,7 @@ package functional;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleUnaryOperator;
@@ -10,82 +11,16 @@ import java.util.function.DoubleUnaryOperator;
 // using method chaining
 public class DSL01 {
 
-    public static void main(String[] args) {
-        {
-            // no method chaining
-            Order order = new Order();
-            order.setCustomer("BigBank");
-
-            Trade trade1 = new Trade();
-            trade1.setType(Trade.Type.BUY);
-
-            Stock stock1 = new Stock();
-            stock1.setSymbol("IBM");
-            stock1.setMarket("NYSE");
-            trade1.setStock(stock1);
-            trade1.setPrice(125.00);
-            trade1.setQuantity(80);
-            order.addTrade(trade1);
-
-            Trade trade2 = new Trade();
-            trade2.setType(Trade.Type.BUY);
-
-            Stock stock2 = new Stock();
-            stock2.setSymbol("GOOGLE");
-            stock2.setMarket("NASDAQ");
-            trade2.setStock(stock2);
-            trade2.setPrice(375.00);
-            trade2.setQuantity(50);
-            order.addTrade(trade2);
-        }
-
-        {
-            // with method chaining
-            Order order1 = MethodChainingOrderBuilder.forCustomer("jorge")
-                    .buy(80).stock("IBM").on("NYSE").at(125.0)
-                    .sell(20).stock("GOOGLE").on("NASDAQ").at(200.0)
-                    .buy(100).stock("TESLA").on("NASDAQ").at(225.0)
-                    .end();
-            order1.getTrades().stream().forEach(System.out::println);
-        }
-
-        {
-            Order order = MethodChainingOrderBuilder.forCustomer("jorge")
-                    .buy(80).stock("IBM").on("NYSE").at(125.0)
-                    .end();
-
-            // dsl with builder
-            double value = new TaxCalculator()
-                    .withTaxRegional()
-                    .withTaxSurcharge()
-                    .calculate(order);
-            System.out.println(value);
-        }
-
-        {
-            Order order = MethodChainingOrderBuilder.forCustomer("jorge")
-                    .buy(80).stock("IBM").on("NYSE").at(125.0)
-                    .end();
-
-            // dsl functional
-            double value = new TaxCalculator2()
-                    .with(Tax::regional)
-                    .with(Tax::surcharge)
-                    .calculate(order);
-            System.out.println(value);
-        }
-    }
-
     @Getter
     @Setter
-    private static class Stock {
+    static class Stock {
         private String symbol;
         private String market;
     }
 
     @Getter
     @Setter
-    private static class Trade {
+    static class Trade {
         public enum Type { BUY, SELL }
 
         private Type type;
@@ -109,7 +44,7 @@ public class DSL01 {
 
     @Getter
     @Setter
-    private static class Order {
+    static class Order {
         private String customer;
         private List<Trade> trades = new ArrayList<>();
 
@@ -122,7 +57,7 @@ public class DSL01 {
         }
     }
 
-    private static class MethodChainingOrderBuilder {
+    static class MethodChainingOrderBuilder {
         public final Order order = new Order();
 
         private MethodChainingOrderBuilder(String customer) {
@@ -151,7 +86,7 @@ public class DSL01 {
         }
     }
 
-    private static class TradeBuilder {
+    static class TradeBuilder {
         private final MethodChainingOrderBuilder builder;
         public final Trade trade = new Trade();
 
@@ -167,7 +102,7 @@ public class DSL01 {
         }
     }
 
-    private static class StockBuilder {
+    static class StockBuilder {
         private final MethodChainingOrderBuilder builder;
         private final Trade trade;
         private final Stock stock = new Stock();
@@ -186,7 +121,7 @@ public class DSL01 {
         }
     }
 
-    private static class TradeBuilderWithStock {
+    static class TradeBuilderWithStock {
         private final MethodChainingOrderBuilder builder;
         private final Trade trade;
 
@@ -202,7 +137,7 @@ public class DSL01 {
         }
     }
 
-    private static class Tax {
+    static class Tax {
         public static double regional(double value) {
             return value * 1.1;
         }
@@ -216,7 +151,7 @@ public class DSL01 {
         }
     }
 
-    private static class TaxCalculator {
+    static class TaxCalculator {
         private boolean useRegional;
         private boolean useGeneral;
         private boolean useSurcharge;
@@ -246,11 +181,14 @@ public class DSL01 {
             if (useRegional) value = Tax.regional(value);
             if (useGeneral) value = Tax.general(value);
             if (useSurcharge) value = Tax.surcharge(value);
-            return value;
+
+            DecimalFormat decimalFormat = new DecimalFormat("#.##");
+            String result = decimalFormat.format(value);
+            return Double.parseDouble(result.replace(',', '.'));
         }
     }
 
-    private static class TaxCalculator2 {
+    static class TaxCalculator2 {
         public DoubleUnaryOperator taxFunction = d -> d;
 
         public TaxCalculator2 with(DoubleUnaryOperator f) {
@@ -259,7 +197,10 @@ public class DSL01 {
         }
 
         public double calculate(Order order) {
-            return taxFunction.applyAsDouble(order.getValue());
+            double value = taxFunction.applyAsDouble(order.getValue());
+            DecimalFormat decimalFormat = new DecimalFormat("#.##");
+            String result = decimalFormat.format(value);
+            return Double.parseDouble(result.replace(',', '.'));
         }
     }
 

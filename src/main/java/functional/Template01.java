@@ -4,40 +4,51 @@ import java.util.function.Consumer;
 
 public class Template01 {
 
-    public static void main(String[] args) {
-        // pattern made with classes
-        new OnlineBankingHappy().processCustomer(1);
+    static abstract class OnlineBanking {
+        private Database database;
 
-        // functional implementation
-        new OnlineBankingLambda().processCustomer(1,
-                (customer -> System.out.println("Hello " + customer.getName())));
-    }
+        public OnlineBanking(Database database) {
+            this.database = database;
+        }
 
-    private static abstract class OnlineBanking {
         public void processCustomer(int id){
-            Customer c = Database.getCustomerWithId(id);
+            Customer c = database.getCustomerWithId(id);
             makeCustomerHappy(c);
         }
         abstract void makeCustomerHappy(Customer c);
     }
 
-    private static class OnlineBankingHappy extends OnlineBanking {
+    static class OnlineBankingHappy extends OnlineBanking {
+        public OnlineBankingHappy(Database database) {
+            super(database);
+        }
+
         @Override
         void makeCustomerHappy(Customer c) {
             System.out.println("Hello " + c.getName());
+            if (!c.isHappy()) {
+                c.setHappy(true);
+            }
         }
     }
 
-    private static class OnlineBankingLambda {
+    static class OnlineBankingLambda {
+        private Database database;
+
+        public OnlineBankingLambda(Database database) {
+            this.database = database;
+        }
+
         public void processCustomer(int id, Consumer<Customer> makeCustomerHappy){
-            Customer c = Database.getCustomerWithId(id);
+            Customer c = database.getCustomerWithId(id);
             makeCustomerHappy.accept(c);
         }
     }
 
-    private static class Customer {
+    static class Customer {
         private int id;
         private String name;
+        private boolean happy;
 
         public Customer(int id, String name) {
             this.id = id;
@@ -47,12 +58,18 @@ public class Template01 {
         public String getName() {
             return name;
         }
+
+        public boolean isHappy() {
+            return happy;
+        }
+
+        void setHappy(boolean happy) {
+            this.happy = happy;
+        }
     }
 
-    private static class Database {
-        public static Customer getCustomerWithId(int id) {
-            return new Customer(id, "test");
-        }
+    interface Database {
+        Customer getCustomerWithId(int id);
     }
 
 }
